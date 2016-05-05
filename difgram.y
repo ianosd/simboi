@@ -1,15 +1,18 @@
 %{
 #include <stdio.h>
 #include "safecat.h"
-extern char* yytext;
-#define YYSTYPE derres
 
 const char* derivand;
 const char* xconst = "x";
 //IMPORTANT for memory management: every string in derres(a pair of derived and initial expression)
 //is created either in a makeres or a safecat function
 %}
-%token NUM UNKN
+%union{
+    derres deriv;
+    char* text;
+}
+%token <text> UNKN
+%type <deriv> der
 %left '+'
 %left '*'
 %%
@@ -22,7 +25,7 @@ der: der '+' der {char* deriv = safecat(2, "%s + %s", $1.dertext, $3.dertext);
 		     char* init =  safecat(2, "%s * %s", $1.inittext, $3.inittext);
                      $$ = makeres(deriv, init);
                   }
-    |UNKN { $$ = onVariable(yytext, derivand); }         
+    |UNKN { $$ = onVariable($1, derivand); }         
     |'(' der ')' {$$ = $2;}
 %%
 int main(int argc, char** argv){
