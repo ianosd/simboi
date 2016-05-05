@@ -3,8 +3,7 @@
 #include "y.tab.h"
 %}
 %%
-sin {yylval.text = "sin"; return FUN;}
-sqr {yylval.text = "sqr"; return FUN;}
+[A-Z]+ {yylval.text = yytext; return FUN;}
 [+*()] 	return yytext[0];
 [a-z]+|[0-9]+ {yylval.text = yytext; return UNKN;}
 [ \t] 
