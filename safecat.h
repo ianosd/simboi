@@ -3,6 +3,8 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 typedef struct stringpair{ 
    char* dertext;
@@ -25,8 +27,17 @@ char* safecat(int n, char* format, ...){
     return result;
 }
 
-derres makeres(char* a, char* b){
-    derres d = {a, b};
+derres makeres(const char* a,const char* b){
+    char* copy_a = (char*)malloc(strlen(a)*sizeof(char));
+    char* copy_b = (char*)malloc(strlen(b)*sizeof(char));
+    strcpy(copy_a, a);
+    strcpy(copy_b, b);
+    derres d = {copy_a, copy_b};
     return d;
+}
+derres onVariable(const char* varname,const char* derivand){
+    if(strcmp(varname, derivand) == 0)
+        return makeres("1", derivand);
+    return makeres("0", varname);
 }
 #endif
