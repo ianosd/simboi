@@ -5,11 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-typedef struct stringpair{ 
-   char* dertext;
-   char* inittext;
-} derres;
+#include "derres.h"
 
 char* safecat(int n, char* format, ...){
     va_list argptr;
@@ -39,5 +35,17 @@ derres onVariable(const char* varname,const char* derivand){
     if(strcmp(varname, derivand) == 0)
         return makeres("1", derivand);
     return makeres("0", varname);
+}
+char* difFun(const char* infun){
+   if(strcmp(infun, "sqr")==0) 
+	return "double";
+   else if(strcmp(infun, "sin")==0)
+        return "cos";
+   else {
+       char* newchar = (char*) malloc(sizeof(infun) + 2);
+       strcpy(newchar, infun);
+       strcat(newchar, "'");
+       return newchar;
+    }
 }
 #endif

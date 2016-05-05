@@ -25,7 +25,12 @@ der: der '+' der {char* deriv = safecat(2, "%s + %s", $1.dertext, $3.dertext);
 		     char* init =  safecat(2, "%s * %s", $1.inittext, $3.inittext);
                      $$ = makeres(deriv, init);
                   }
-    |UNKN { $$ = onVariable($1, derivand); }         
+    |UNKN '(' der ')' {char* deriv = safecat(3, "%s(%s)*(%s)", difFun($1), $3.inittext, $3.dertext);
+			//TODO should not free $1 here
+                       char* init = safecat(2, "%s(%s)", $1, $3.inittext);
+		       $$ = makeres(deriv, init);
+                       }
+    |UNKN { printf("ident(%s) as var\n", $1);$$ = onVariable($1, derivand); }         
     |'(' der ')' {$$ = $2;}
 %%
 int main(int argc, char** argv){
