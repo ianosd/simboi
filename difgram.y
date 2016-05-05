@@ -11,7 +11,7 @@ const char* xconst = "x";
     derres deriv;
     char* text;
 }
-%token <text> UNKN
+%token <text> UNKN FUN
 %type <deriv> der
 %left '+'
 %left '*'
@@ -25,7 +25,7 @@ der: der '+' der {char* deriv = safecat(2, "%s + %s", $1.dertext, $3.dertext);
 		     char* init =  safecat(2, "%s * %s", $1.inittext, $3.inittext);
                      $$ = makeres(deriv, init);
                   }
-    |UNKN '(' der ')' {char* deriv = safecat(3, "%s(%s)*(%s)", difFun($1), $3.inittext, $3.dertext);
+    |FUN '(' der ')' {char* deriv = safecat(3, "%s(%s)*(%s)", difFun($1), $3.inittext, $3.dertext);
 			//TODO should not free $1 here
                        char* init = safecat(2, "%s(%s)", $1, $3.inittext);
 		       $$ = makeres(deriv, init);
