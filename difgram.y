@@ -10,9 +10,12 @@ const char* xconst = "x";
 %union{
     derres deriv;
     char* text;
+    int fvalue
 }
-%token <text> UNKN FUN
+%token <text> UNKN
+%token <fvalue> SIN COS EXP LOG
 %type <deriv> der
+%type <fvalue> fun
 %left '+'
 %left '*'
 %%
@@ -25,13 +28,20 @@ der: der '+' der {char* deriv = safecat(2, "%s + %s", $1.dertext, $3.dertext);
 		     char* init =  safecat(2, "%s * %s", $1.inittext, $3.inittext);
                      $$ = makeres(deriv, init);
                   }
-    |FUN '(' der ')' {char* deriv = safecat(3, "%s(%s)*(%s)", difFun($1), $3.inittext, $3.dertext);
+    |UNKN '(' der ')' {char* deriv = safecat(3, "%s(%s)*(%s)", difFun($1), $3.inittext, $3.dertext);
 			//TODO should not free $1 here
                        char* init = safecat(2, "%s(%s)", $1, $3.inittext);
 		       $$ = makeres(deriv, init);
                        }
+    |fun '(' der ')' {derres dd = kdifFun($1); printf("Der = %s\n", dd);char* deriv = safecat(3, "%s(%s)*(%s)", dd.dertext,  $3.inittext, $3.dertext);
+                       char* init = safecat(2, "%s(%s)", dd.inittext, $3.inittext);
+		       $$ = makeres(deriv, init);}
     |UNKN { printf("ident(%s) as var\n", $1);$$ = onVariable($1, derivand); }         
     |'(' der ')' {$$ = $2;}
+fun: SIN {$$=$1;}
+    |COS {$$=$1;}
+    |EXP {$$=$1;}
+    |LOG {$$=$1;}
 %%
 int main(int argc, char** argv){
    if(argc ==1)

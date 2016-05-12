@@ -6,6 +6,6 @@ vocab: diflex.l
 gram: difgram.y
 	yacc -d difgram.y
 
-compile: vocab gram safecat.h
-	gcc -o diff lex.yy.c y.tab.c
+compile: vocab gram safecat.h kdifFun.c
+	gcc -o diff lex.yy.c y.tab.c kdifFun.c
 
