@@ -19,7 +19,7 @@ const char* xconst = "x";
 %left '+'
 %left '*'
 %%
-start: der {printf("%s", $1);}
+expr: 'D' '[' UNKN {derivand = strdup($3);printf("Diff rel to %s\n", derivand);} ',' der ']' {printf("%s\n", $6.dertext);}
 der: der '+' der {char* deriv = safecat(2, "%s + %s", $1.dertext, $3.dertext);
 		  char* init = safecat(2, "%s + %s", $1.inittext, $3.inittext);
                   $$ = makeres(deriv, init);
