@@ -30,10 +30,15 @@ void done_scan_string();
 %left '+'
 %left '*'
 %%
+/*arithmetic-specific gramar*/
+
 start: expr {printf("Identified expression\n"); printsum($1);}
 expr: term {printf("Made empty sum"); $$=emptysum();addTerm($$, $1);}
     | term '+' expr {$$ = $3; addTerm($$, $1);printf("Add term to sum");}
     | '(' expr ')' {$$ = $2;}
+    | expr '*' expr { $$ = $1; mulsums($$, $1); printf("Multiplying two sum expressions\n");}
+
+/*this one to allow derivatives to be expressions*/
 expr: 'D' '[' UNKN {derivand = strdup($3);printf("Diff rel to %s\n", derivand);} 
       ',' der ']'{ //as soon as der text is avalible, add it to the input stack
                 addToInputStack(&myInputStack,$6.dertext);
@@ -45,8 +50,11 @@ expr: 'D' '[' UNKN {derivand = strdup($3);printf("Diff rel to %s\n", derivand);}
 
 term: NUM  {$$ = emptyprod(); multerm_num($$, $1);} 
     | UNKN {$$ = emptyprod(); multerm_sym($$, $1);}
-    | term '*' term {$$ = $3; multerm_sym($$, $1);printf("Mut term*term\n");}
+    | term '*' term {$$ = $3; multerms($$, $1);printf("Mut term*term\n");}
     | '(' term ')' {$$ = $2;}
+
+/*end of arithmetic gramar*/
+
 der: der '+' der {char* deriv = safecat(2, "%s + %s", $1.dertext, $3.dertext);
 		  char* init = safecat(2, "%s + %s", $1.inittext, $3.inittext);
                   $$ = makeres(deriv, init);

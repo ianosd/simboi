@@ -20,6 +20,7 @@ typedef struct term_struct{
 
 typedef struct exp_struct{
     prodstruct* firstTerm;
+    prodstruct* nextTerm;
 }sumstruct; 
 
 int getsymid(char* sym);
@@ -28,6 +29,9 @@ prodstruct* emptyprod();
 node* maketerm(char* sym);
 void multerm_num(prodstruct* prod, int n);
 void multerm_sym(prodstruct* prod, char* sym);
+void multerms(prodstruct* dst, prodstruct* other);
+void mulsums( sumstruct* dst, sumstruct* other); 
+void addsums(sumstruct* dst, sumstruct* other); 
 void addTerm(sumstruct* sum, prodstruct* p);
 void printsum(sumstruct*);
 #endif

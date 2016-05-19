@@ -28,12 +28,20 @@ void multerm_sym(prodstruct* prod, char* sym){
     n->next = prod->term;
     prod->term = n;
 }
-void multerms(prodstruct* dest, prodstruct* other
-void addTerm(sumstruct* sum, prodstruct* p){
-    if(p->mul != 0){
-       p->nextterm = sum->firstTerm;
-       sum->firstTerm = p;
-    }
+void multerms(prodstruct* dest, prodstruct* other){
+  dest->mul *= other->mul;
+  if(dest->term !=NULL)
+    append(dest->term, other->term);
+  else
+    dest->term = other->term;
+}
+void mulsums(sumstruct* dst, sumstruct* other){
+  
+void append(node* a, node* b){
+  if(a->next == NULL){
+    a->next = b;
+  }
+  else append(a->next, b);
 }
 node* maketerm(char* sym){
     node* nod= (node*) malloc(sizeof(node));
