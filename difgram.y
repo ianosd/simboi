@@ -37,7 +37,7 @@ der: der '+' der {char* deriv = safecat(2, "%s + %s", $1.dertext, $3.dertext);
                        char* init = safecat(2, "%s(%s)", dd.inittext, $3.inittext);
 		       $$ = makeres(deriv, init);}
     |UNKN { printf("ident(%s) as var\n", $1);$$ = onVariable($1, derivand); }         
-    |'(' der ')' {$$ = $2;}
+    |'(' der ')' {char* text = safecat(1, "(%s)", $2.inittext); $$ = makeres($2.dertext, text);}
 fun: SIN {$$=$1;}
     |COS {$$=$1;}
     |EXP {$$=$1;}
