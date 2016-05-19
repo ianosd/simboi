@@ -1,11 +1,13 @@
 #include "derres.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 int getsymid(char* sym){
     return sym[0];
 }
 node* copyNode(node* n){
   node* ret=NULL;
+  printf("nodecopy\n");
   if(n!=NULL){
     ret = (node*) malloc(sizeof(node));
     ret->id = n->id;
@@ -16,6 +18,7 @@ node* copyNode(node* n){
 
 prodstruct* copyProd(prodstruct* prod){
   prodstruct* copy = (prodstruct*) malloc(sizeof(prodstruct));
+  printf("prodcopy\n");
   copy->mul = prod->mul;
   copy->term = copyNode(prod->term);
   return copy;
@@ -23,10 +26,11 @@ prodstruct* copyProd(prodstruct* prod){
 
 sumstruct* copySum(sumstruct* sum){
   sumstruct* copy = NULL;
+  printf("sumcopy\n");
   if(sum!=NULL)
   {
     copy = (sumstruct*) malloc(sizeof(sumstruct));
-    copy->firstTerm = copyProd(sum->term);
+    copy->firstTerm = copyProd(sum->firstTerm);
     copy->nextTerm = copySum(sum->nextTerm);
   }
   return copy;
@@ -69,8 +73,31 @@ void multerms(prodstruct* dest, prodstruct* other){
   else
     dest->term = other->term;
 }
+void sumtimesprod(sumstruct* dst, prodstruct* other){
+  while(dst!=NULL){
+    multerms(dst->firstTerm, other);
+    dst = dst->nextTerm;
+  }
+}
+void addsums(sumstruct* dst, sumstruct* other){
+  if(dst->nextTerm == NULL)
+    dst->nextTerm = other;
+  else addsums(dst->nextTerm, other);
+}
 void mulsums(sumstruct* dst, sumstruct* other){
-}  
+  sumstruct* backupdst = copySum(dst);
+  printsum(dst);
+  printf("Copy of sum\n");
+  printsum(dst);
+  sumtimesprod(dst, other->firstTerm);
+  other = other->nextTerm;
+  while(other != NULL){
+    sumstruct* dstcopy = copySum(backupdst);
+    sumtimesprod(dstcopy, other->firstTerm);
+    addsums(dst, dstcopy);
+  }
+}
+
 void addTerm(sumstruct* sum, prodstruct* p){
   if(p->mul !=0){
     sumstruct* termholder = termedsum(p);

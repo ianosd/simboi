@@ -36,7 +36,7 @@ start: expr {printf("Identified expression\n"); printsum($1);}
 expr: term {printf("Made empty sum"); $$=termedsum($1);}
     | term '+' expr {$$ = $3; addTerm($$, $1);printf("Add term to sum");}
     | '(' expr ')' {$$ = $2;}
-    | expr '*' expr { $$ = $1; mulsums($$, $1); printf("Multiplying two sum expressions\n");}
+    | expr '*' expr { printf("Multiplying two sum expressions\n");$$ = $1; mulsums($$, $3); }
 
 /*this one to allow derivatives to be expressions*/
 expr: 'D' '[' UNKN {derivand = strdup($3);printf("Diff rel to %s\n", derivand);} 
@@ -124,6 +124,7 @@ int main(int argc, char** argv){
     addToInputStack(&myInputStack, a);
     popInputStack(&myInputStack, &yyin);
     yyparse();
+    printf("(Done)\n");
   }
 }
 
