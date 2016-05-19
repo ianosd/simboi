@@ -55,12 +55,12 @@ term: NUM  {$$ = emptyprod(); multerm_num($$, $1);}
 
 /*end of arithmetic gramar*/
 
-der: der '+' der {char* deriv = safecat(2, "%s + %s", $1.dertext, $3.dertext);
-		  char* init = safecat(2, "%s + %s", $1.inittext, $3.inittext);
+der: der '+' der {char* deriv = safecat(2, "(%s + %s)", $1.dertext, $3.dertext);
+		  char* init = safecat(2, "(%s + %s)", $1.inittext, $3.inittext);
                   $$ = makeres(deriv, init);
                  }
-    | der '*' der {  char* deriv = safecat(4, "(%s)*(%s) + (%s)*(%s)", $1.inittext, $3.dertext, $1.dertext, $3.inittext);
-		     char* init =  safecat(2, "%s * %s", $1.inittext, $3.inittext);
+    | der '*' der {  char* deriv = safecat(4, "((%s)*(%s) + (%s)*(%s))", $1.inittext, $3.dertext, $1.dertext, $3.inittext);
+		     char* init =  safecat(2, "((%s) * (%s))", $1.inittext, $3.inittext);
                      $$ = makeres(deriv, init);
                   }
     |UNKN '(' der ')' {char* deriv = safecat(3, "%s(%s)*(%s)", difFun($1), $3.inittext, $3.dertext);
@@ -73,7 +73,8 @@ der: der '+' der {char* deriv = safecat(2, "%s + %s", $1.dertext, $3.dertext);
 		       $$ = makeres(deriv, init);}
     |UNKN { printf("ident(%s) as var\n", $1);$$ = onVariable($1, derivand); }         
     |NUM {printf("Got a number %d\n", $1); $$ = makeres("0", yytext);}
-    |'(' der ')' {$$ = $2;}
+    |'(' der ')' {char* dert = safecat(1, "(%s)", $2.dertext); char* text = safecat(1, "(%s)", $2.inittext); $$ = makeres(dert, text);}
+
 fun: SIN {$$=$1;}
     |COS {$$=$1;}
     |EXP {$$=$1;}
