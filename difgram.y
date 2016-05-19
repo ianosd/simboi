@@ -45,8 +45,7 @@ expr: 'D' '[' UNKN {derivand = strdup($3);printf("Diff rel to %s\n", derivand);}
 
 term: NUM  {$$ = emptyprod(); multerm_num($$, $1);} 
     | UNKN {$$ = emptyprod(); multerm_sym($$, $1);}
-    | NUM '*' term {$$ = $3; multerm_num($$, $1);printf("Mul By Number");}
-    | UNKN '*' term {$$ = $3; multerm_sym($$, $1);printf("Mul By Term");}
+    | term '*' term {$$ = $3; multerm_sym($$, $1);printf("Mut term*term\n");}
     | '(' term ')' {$$ = $2;}
 der: der '+' der {char* deriv = safecat(2, "%s + %s", $1.dertext, $3.dertext);
 		  char* init = safecat(2, "%s + %s", $1.inittext, $3.inittext);
@@ -72,39 +71,52 @@ fun: SIN {$$=$1;}
     |EXP {$$=$1;}
     |LOG {$$=$1;}
 %%
-int main(int argc, char** argv){
-////   yydebug = 1;
-//   if(argc ==1)
-//       derivand = xconst;
-//   else
-//       yyin = fopen(argv[1], "r");
-    char input[] = "a + D[x, x*x] + b";
-    int i = 0;
-    char *aguy = (char*) malloc(strlen(input)+2);
+void splitByChar(char c, const char *input, char** a, char** b){
+    char* aguy = (char*) malloc(strlen(input)+2);
+    char *bguy;
     char *p1 = aguy;
     char *p2 = input;
-    while(*p2!=']'){
+    while(*p2!=c && *p2 != '\0'){
         *p1 = *p2;
         p1++; p2++;
     }
     *p1 = *p2;//assign ']'
     p1++; *p1 = '\0';//Null terminate string
-
+    if(*p2 == 0){
+      bguy = p1;
+    }
+    else{
     p2++;
-    char* bguy = ++p1;
+    bguy = ++p1;
     char stop = 0;
     while(!stop)
     {
-        stop = (*p2 == '\0');
-        *p1 = *p2;
-        p1++; p2++;
-    }
-    printf("s1: %s, s2: %s\n", aguy, bguy);
+      stop = (*p2 == '\0');
+      *p1 = *p2;
+      p1++; p2++;
+    }}
+    *a = aguy;
+    *b = bguy;
+}
+int main(int argc, char** argv){
+  ////   yydebug = 1;
+  //   if(argc ==1)
+  //       derivand = xconst;
+  //   else
+  //       yyin = fopen(argv[1], "r");
+  char input[100] = "notexit";
+  char *a, *b;
+  while(strcmp(input, "exit")!=0){
+    scanf("%99s", input);
+    printf("Input = %s\n", input);
+    splitByChar(']', input, &a, &b);
+    printf("s1: %s, s2: %s\n", a, b);
     init_inStack(&myInputStack);
-    addToInputStack(&myInputStack, bguy);
-    addToInputStack(&myInputStack, aguy);
+    addToInputStack(&myInputStack, b);
+    addToInputStack(&myInputStack, a);
     popInputStack(&myInputStack, &yyin);
     yyparse();
+  }
 }
 
 int yyerror(char* str){return -1;}

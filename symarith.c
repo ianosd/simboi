@@ -28,6 +28,7 @@ void multerm_sym(prodstruct* prod, char* sym){
     n->next = prod->term;
     prod->term = n;
 }
+void multerms(prodstruct* dest, prodstruct* other
 void addTerm(sumstruct* sum, prodstruct* p){
     if(p->mul != 0){
        p->nextterm = sum->firstTerm;
