@@ -24,11 +24,12 @@ typedef struct exp_struct{
 
 int getsymid(char* sym);
 sumstruct* emptysum();
+sumstruct* termedsum(prodstruct*);
 prodstruct* emptyprod();
 node* maketerm(char* sym);
 void multerm_num(prodstruct* prod, int n);
 void multerm_sym(prodstruct* prod, char* sym);
-void multerms(prodstruct* dst, prodstruct* other);
+void multerms(prodstruct* dst, const prodstruct* other);
 void mulsums( sumstruct* dst, sumstruct* other); 
 void addsums(sumstruct* dst, sumstruct* other); 
 void addTerm(sumstruct* sum, prodstruct* p);

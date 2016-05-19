@@ -32,11 +32,11 @@ void done_scan_string();
 %%
 /*arithmetic-specific gramar*/
 
-start: expr {printf("Identified expression\n"); printsum($1);}
+start: expr {printf("Identified expression:\n"); printsum($1);}
 expr: term {printf("Made empty sum"); $$=termedsum($1);}
-    | term '+' expr {$$ = $3; addTerm($$, $1);printf("Add term to sum");}
     | '(' expr ')' {$$ = $2;}
     | expr '*' expr { printf("Multiplying two sum expressions\n");$$ = $1; mulsums($$, $3); }
+    | expr '+' expr {$$ = $1; addsums($$, $3);}
 
 /*this one to allow derivatives to be expressions*/
 expr: 'D' '[' UNKN {derivand = strdup($3);printf("Diff rel to %s\n", derivand);} 
@@ -50,8 +50,8 @@ expr: 'D' '[' UNKN {derivand = strdup($3);printf("Diff rel to %s\n", derivand);}
 
 term: NUM  {$$ = emptyprod(); multerm_num($$, $1);} 
     | UNKN {$$ = emptyprod(); multerm_sym($$, $1);}
-    | term '*' term {$$ = $3; multerms($$, $1);printf("Mut term*term\n");}
-    | '(' term ')' {$$ = $2;}
+    /*| term '*' term {$$ = $3; multerms($$, $1);printf("Mut term*term\n");}*/
+    /*| '(' term ')' {$$ = $2;}*/
 
 /*end of arithmetic gramar*/
 
@@ -83,7 +83,7 @@ void splitByChar(char c, const char *input, char** a, char** b){
     char* aguy = (char*) malloc(strlen(input)+2);
     char *bguy;
     char *p1 = aguy;
-    char *p2 = input;
+    const char *p2 = input;
     while(*p2!=c && *p2 != '\0'){
         *p1 = *p2;
         p1++; p2++;
@@ -107,25 +107,24 @@ void splitByChar(char c, const char *input, char** a, char** b){
     *b = bguy;
 }
 int main(int argc, char** argv){
-  ////   yydebug = 1;
-  //   if(argc ==1)
-  //       derivand = xconst;
-  //   else
-  //       yyin = fopen(argv[1], "r");
-  char input[100] = "notexit";
-  char *a, *b;
-  while(strcmp(input, "exit")!=0){
-    scanf("%99s", input);
-    printf("Input = %s\n", input);
-    splitByChar(']', input, &a, &b);
-    printf("s1: %s, s2: %s\n", a, b);
-    init_inStack(&myInputStack);
-    addToInputStack(&myInputStack, b);
-    addToInputStack(&myInputStack, a);
-    popInputStack(&myInputStack, &yyin);
-    yyparse();
-    printf("(Done)\n");
-  }
+    char input[100] = "notexit";
+    if(argc ==1)
+        derivand = xconst;
+    else
+        strcpy(input, argv[1]);
+    char *a, *b;
+    while(strcmp(input, "exit")!=0){
+        printf("Input = %s\n", input);
+        splitByChar(']', input, &a, &b);
+        printf("s1: %s, s2: %s\n", a, b);
+        init_inStack(&myInputStack);
+        addToInputStack(&myInputStack, b);
+        addToInputStack(&myInputStack, a);
+        popInputStack(&myInputStack, &yyin);
+        yyparse();
+        printf("(Done)\n");
+        scanf("%99s", input);
+    }
 }
 
 int yyerror(char* str){return -1;}

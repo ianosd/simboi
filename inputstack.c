@@ -1,5 +1,6 @@
 #include "inputstack.h"
 #include <stdio.h>
+#include <string.h>
 void addToInputStack(instack_t* stack, char* str)
 {
     FILE* f = fmemopen(str, strlen(str), "r");
