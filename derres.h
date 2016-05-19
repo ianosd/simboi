@@ -15,7 +15,6 @@ typedef struct node_struct{
 typedef struct term_struct{
     int mul;
     node* term;
-    struct term_struct* nextterm;
 } prodstruct;
 
 typedef struct exp_struct{

@@ -4,6 +4,34 @@
 int getsymid(char* sym){
     return sym[0];
 }
+node* copyNode(node* n){
+  node* ret=NULL;
+  if(n!=NULL){
+    ret = (node*) malloc(sizeof(node));
+    ret->id = n->id;
+    ret->next = copyNode(n->next);
+  }
+  return ret;
+}
+
+prodstruct* copyProd(prodstruct* prod){
+  prodstruct* copy = (prodstruct*) malloc(sizeof(prodstruct));
+  copy->mul = prod->mul;
+  copy->term = copyNode(prod->term);
+  return copy;
+}
+
+sumstruct* copySum(sumstruct* sum){
+  sumstruct* copy = NULL;
+  if(sum!=NULL)
+  {
+    copy = (sumstruct*) malloc(sizeof(sumstruct));
+    copy->firstTerm = copyProd(sum->term);
+    copy->nextTerm = copySum(sum->nextTerm);
+  }
+  return copy;
+}
+
 
 sumstruct* emptysum(){
     sumstruct* asum = (sumstruct*) malloc(sizeof(sumstruct));
@@ -42,7 +70,7 @@ void multerms(prodstruct* dest, prodstruct* other){
     dest->term = other->term;
 }
 void mulsums(sumstruct* dst, sumstruct* other){
-  
+}  
 void addTerm(sumstruct* sum, prodstruct* p){
   if(p->mul !=0){
     sumstruct* termholder = termedsum(p);
