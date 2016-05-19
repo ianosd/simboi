@@ -33,7 +33,7 @@ void done_scan_string();
 /*arithmetic-specific gramar*/
 
 start: expr {printf("Identified expression\n"); printsum($1);}
-expr: term {printf("Made empty sum"); $$=emptysum();addTerm($$, $1);}
+expr: term {printf("Made empty sum"); $$=termedsum($1);}
     | term '+' expr {$$ = $3; addTerm($$, $1);printf("Add term to sum");}
     | '(' expr ')' {$$ = $2;}
     | expr '*' expr { $$ = $1; mulsums($$, $1); printf("Multiplying two sum expressions\n");}

@@ -20,7 +20,7 @@ typedef struct term_struct{
 
 typedef struct exp_struct{
     prodstruct* firstTerm;
-    prodstruct* nextTerm;
+    struct exp_struct* nextTerm;
 }sumstruct; 
 
 int getsymid(char* sym);

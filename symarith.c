@@ -8,13 +8,19 @@ int getsymid(char* sym){
 sumstruct* emptysum(){
     sumstruct* asum = (sumstruct*) malloc(sizeof(sumstruct));
     asum->firstTerm = NULL;
+    asum->nextTerm = NULL;
+    return asum;
+}
+sumstruct* termedsum(prodstruct* p){
+    sumstruct* asum = (sumstruct*) malloc(sizeof(sumstruct));
+    asum->firstTerm = p;
+    asum->nextTerm = NULL;
     return asum;
 }
 prodstruct* emptyprod(){
     prodstruct* aprod = (prodstruct*) malloc(sizeof(prodstruct));
     aprod->mul = 1;
     aprod->term = NULL;
-    aprod->nextterm = NULL;
     return aprod;
 }
 
@@ -37,6 +43,14 @@ void multerms(prodstruct* dest, prodstruct* other){
 }
 void mulsums(sumstruct* dst, sumstruct* other){
   
+void addTerm(sumstruct* sum, prodstruct* p){
+  if(p->mul !=0){
+    sumstruct* termholder = termedsum(p);
+    termholder->nextTerm = sum->nextTerm;
+    sum->nextTerm = termholder;
+  }
+}
+
 void append(node* a, node* b){
   if(a->next == NULL){
     a->next = b;
@@ -51,21 +65,28 @@ node* maketerm(char* sym){
 }
 void printterm(prodstruct* term){
     node* rterm = term->term;
-    if(term->mul!=1)
-    printf("%d",term->mul);
-    while(rterm!=NULL){
-        printf("*%c", rterm->id);
+    if(rterm != NULL){
+      if(term->mul!=1)
+        printf("%d*",term->mul);
+      while(rterm->next!=NULL){
+        printf("%c*", rterm->id);
         rterm = rterm->next;
+      }
+      printf("%c", rterm->id);
+    }
+    else{
+      printf("%d", term->mul);
     }
 }
 
 void printsum(sumstruct* sum){
     prodstruct* term = sum->firstTerm;
-    while(term != NULL){
+    while(sum->nextTerm != NULL){
         printterm(term);
         printf(" + ");
-        term = term->nextterm;
+        sum = sum->nextTerm;
+        term = sum->firstTerm;
     }
-    printf("0");
+    printterm(sum->firstTerm);
 }
 
