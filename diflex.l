@@ -12,14 +12,22 @@ exp {yylval.num = EXP; return EXP;}
 log {yylval.num = LOG; return LOG;}
 [+*()\[\]D,=!] 	return yytext[0];
 [a-z]+'? {char*  copy = malloc(strlen(yytext)+1); strcpy(copy, yytext);  yylval.text = copy; return UNKN;}
-[0-9]+ {printf("Ident text as number"); yylval.num = atoi(yytext); return NUM;}
+[0-9]+ {
+#ifdef DOLOG
+    printf("Ident text as number");
+#endif
+yylval.num = atoi(yytext); return NUM;}
 [ \t] 
-. 	{printf("Lexical error"); return 0;}
+. 	{
+    printf("Lexical error");
+return 0;}
 [\n\0]      return 0;
 %%
 
 int yywrap(){
+       #ifdef DOLOG
         printf("Reached end of stream\n");
+#endif
 return 1-popInputStack(&myInputStack, &yyin);
 }
 

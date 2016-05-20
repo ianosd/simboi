@@ -36,19 +36,35 @@ void done_scan_string();
 %%
 /*arithmetic-specific gramar*/
 
-start: expr {printf("Identified expression:"); printsum($1);printf("\n");}
+start: expr {printf("ans = "); printsum($1); bind("ans", $1); printf("\n");}
      | UNKN '=' expr {bind($1, $3); printf("%s = ", $1); printsum($3); printf("\n");}
-expr: term {printf("Made empty sum"); $$=termedsum($1);}
+expr: term {
+#ifdef DOLOG
+    printf("Made empty sum");
+#endif
+            $$=termedsum($1);}
     | '!' UNKN {$$ = findbinding($2); }
     | '(' expr ')' {$$ = $2;}
-    | expr '*' expr { printf("Multiplying two sum expressions\n");$$ = $1; mulsums($$, $3); }
+    | expr '*' expr { 
+    #ifdef DOLOG
+        printf("Multiplying two sum expressions\n");
+#endif
+    $$ = $1; mulsums($$, $3); }
     | expr '+' expr {$$ = $1; addsums($$, $3);}
 
 /*this one to allow derivatives to be expressions*/
-expr: 'D' '[' UNKN {derivand = strdup($3);printf("Diff rel to %s\n", derivand);} 
+expr: 'D' '[' UNKN {derivand = strdup($3);
+#ifdef DOLOG
+    printf("Diff rel to %s\n", derivand);
+#endif
+} 
       ',' der ']'{ //as soon as der text is avalible, add it to the input stack
                 addToInputStack(&myInputStack,$6.dertext);
-                printf("dErtext = %s\n", $6.dertext);//TODO dealocate derivand}
+                
+                #ifdef DOLOG
+                    printf("dErtext = %s\n", $6.dertext);
+#endif
+//TODO dealocate derivand}
             } 
             expr {$$=$9;};
 
@@ -56,6 +72,7 @@ expr: 'D' '[' UNKN {derivand = strdup($3);printf("Diff rel to %s\n", derivand);}
 
 term: NUM  {$$ = emptyprod(); multerm_num($$, $1);} 
     | UNKN {$$ = emptyprod(); multerm_sym($$, $1);}
+    | UNKN '(' UNKN ')' {char* sym = safecat(2, "%s(%s)", $1, $3); $$ = emptyprod(); multerm_sym($$, sym);}
     /*| term '*' term {$$ = $3; multerms($$, $1);printf("Mut term*term\n");}*/
     /*| '(' term ')' {$$ = $2;}*/
 
@@ -74,11 +91,23 @@ der: der '+' der {char* deriv = safecat(2, "(%s + %s)", $1.dertext, $3.dertext);
                        char* init = safecat(2, "%s(%s)", $1, $3.inittext);
 		       $$ = makeres(deriv, init);
                        }
-    |fun '(' der ')' {derres dd = kdifFun($1); printf("Der = %s\n", dd);char* deriv = safecat(3, "%s(%s)*(%s)", dd.dertext,  $3.inittext, $3.dertext);
+    |fun '(' der ')' {derres dd = kdifFun($1); 
+    #ifdef DOLOG
+        printf("Der = %s\n", dd);
+#endif
+char* deriv = safecat(3, "%s(%s)*(%s)", dd.dertext,  $3.inittext, $3.dertext);
                        char* init = safecat(2, "%s(%s)", dd.inittext, $3.inittext);
 		       $$ = makeres(deriv, init);}
-    |UNKN { printf("ident(%s) as var\n", $1);$$ = onVariable($1, derivand); } 
-    |NUM {printf("Got a number %d\n", $1); $$ = makeres("0", yytext);}
+    |UNKN { 
+    #ifdef DOLOG
+        printf("ident(%s) as var\n", $1);
+#endif
+$$ = onVariable($1, derivand); } 
+    |NUM {
+#ifdef DOLOG
+    printf("Got a number %d\n", $1);
+#endif
+    $$ = makeres("0", yytext);}
     |'(' der ')' {char* dert = safecat(1, "(%s)", $2.dertext); char* text = safecat(1, "(%s)", $2.inittext); $$ = makeres(dert, text);}
 
 fun: SIN {$$=$1;}
@@ -125,17 +154,29 @@ int main(int argc, char** argv){
         strcpy(input, argv[1]);
     char *a, *b;
     while(strcmp(input, "exit")!=0){
-        printf("Input = %s\n", input);
+        
+        scanf("%[^\n]99s", input);
+        getchar();
+#ifdef DOLOG
+    printf("Input = %s\n", input);
+#endif
+
         splitByChar(']', input, &a, &b);
-        printf("s1: %s, s2: %s\n", a, b);
+        
+#ifdef DOLOG
+    printf("s1: %s, s2: %s\n", a, b);
+#endif
+
         init_inStack(&myInputStack);
         addToInputStack(&myInputStack, b);
         addToInputStack(&myInputStack, a);
         popInputStack(&myInputStack, &yyin);
         yyparse();
-        printf("(Done)\n");
-        scanf("%[^\n]99s", input);
-        getchar();
+        
+#ifdef DOLOG
+    printf("(Done)\n");
+#endif
+
     }
 }
 

@@ -117,7 +117,9 @@ void multerm_sym(prodstruct* prod, char* sym){
 
 void multerms(prodstruct* dest, const prodstruct* otherorig){
 prodstruct* other = copyProd(otherorig);
-printf("mul: ");printterm(dest);printterm(other); printf("\n");
+#ifdef LOG
+    printf("mul: ");printterm(dest);printterm(other); printf("\n");
+#endif
   dest->mul *= other->mul;
   if(dest->term !=NULL){
       //check if other should actually come first
@@ -132,18 +134,26 @@ printf("mul: ");printterm(dest);printterm(other); printf("\n");
   }
   else
     dest->term = other->term;
-printf("Result: "); printterm(dest);printf("\n");
+#ifdef LOG
+    printf("Result: "); printterm(dest);printf("\n");
+#endif
 }
 
 void sumtimesprod(sumstruct* dst, prodstruct* other){
-printf("Multiplying: ");printsum(dst);printf(" by ");printterm(other);printf("\n");
+#ifdef LOG
+    printf("Multiplying: ");printsum(dst);printf(" by ");printterm(other);printf("\n");
+#endif
 sumstruct* save = dst;
   while(dst!=NULL){
     multerms(dst->firstTerm, other);
-    printf("now other is: "); printterm(other);printf("and firstterm: ");printterm(dst->firstTerm);
+    #ifdef LOG
+        printf("now other is: "); printterm(other);printf("and firstterm: ");printterm(dst->firstTerm);
+#endif
     dst = dst->nextTerm;
   }
-printf("RES: ");printsum(save);printf("\n");
+#ifdef LOG
+    printf("RES: ");printsum(save);printf("\n");
+#endif
 }
 
 //this is louzy
@@ -203,13 +213,19 @@ void addsums2(sumstruct* dst, sumstruct* other){
 }
 
 void mulsums(sumstruct* dst, sumstruct* other){
-  printf("Make Backup\n");
+  #ifdef LOG
+    printf("Make Backup\n");
+#endif
   sumstruct* backupdst = copySum(dst);
-  printf("Twas the copy\n");
+  #ifdef LOG
+    printf("Twas the copy\n");
+#endif
   sumtimesprod(dst, other->firstTerm);
   other = other->nextTerm;
   while(other != NULL){
-    printf("Backup is: ");printsum(backupdst);printf("\n");
+    #ifdef LOG
+        printf("Backup is: ");printsum(backupdst);printf("\n");
+#endif
     sumstruct* dstcopy = copySum(backupdst);
     sumtimesprod(dstcopy, other->firstTerm);
     addsums(dst, dstcopy);
