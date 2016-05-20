@@ -11,7 +11,7 @@ cos {yylval.num = COS; return COS;}
 exp {yylval.num = EXP; return EXP;}
 log {yylval.num = LOG; return LOG;}
 [+*()\[\]D,=!] 	return yytext[0];
-[a-z]+ {char*  copy = malloc(strlen(yytext)+1); strcpy(copy, yytext);  yylval.text = copy; return UNKN;}
+[a-z]+'? {char*  copy = malloc(strlen(yytext)+1); strcpy(copy, yytext);  yylval.text = copy; return UNKN;}
 [0-9]+ {printf("Ident text as number"); yylval.num = atoi(yytext); return NUM;}
 [ \t] 
 . 	{printf("Lexical error"); return 0;}

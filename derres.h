@@ -23,6 +23,9 @@ typedef struct exp_struct{
 }sumstruct; 
 
 int getsymid(const char* sym);
+void initVarHash();
+char* getsymtext(int id);
+int symord(int a, int b);
 sumstruct* emptysum();
 sumstruct* termedsum(prodstruct*);
 prodstruct* emptyprod();

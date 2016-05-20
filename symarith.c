@@ -8,13 +8,7 @@ int sign(int a){
     else if (a<0) return -1;
     else return 0;
 }
-int getsymid(const char* sym){
-    return sym[0];
-}
 
-int symord(int a, int b){
-    return sign(a-b);
-}
 
 int termcmp(node* a, node* b){
     if(a == NULL){
@@ -243,16 +237,31 @@ void printterm(prodstruct* term){
       if(term->mul!=1)
         printf("%d*",term->mul);
       while(rterm->next!=NULL){
-        printf("%c*", rterm->id);
+        printf("%s*", getsymtext(rterm->id));
         rterm = rterm->next;
       }
-      printf("%c", rterm->id);
+        printf("%s", getsymtext(rterm->id));
     }
     else{
       printf("%d", term->mul);
     }
 }
 
+void fprintterm(FILE* f, prodstruct* term){
+    node* rterm = term->term;
+    if(rterm != NULL){
+      if(term->mul!=1)
+        fprintf(f, "%d*",term->mul);
+      while(rterm->next!=NULL){
+        fprintf(f, "%s*", getsymtext(rterm->id));
+        rterm = rterm->next;
+      }
+        fprintf(f,"%s", getsymtext(rterm->id));
+    }
+    else{
+      fprintf(f,"%d", term->mul);
+    }
+}
 void printsum(sumstruct* sum){
     prodstruct* term = sum->firstTerm;
     while(sum->nextTerm != NULL){
@@ -266,3 +275,15 @@ void printsum(sumstruct* sum){
     else printf("empty sum, weird\n");
 }
 
+void sprintsum(FILE* f, sumstruct* sum){
+    prodstruct* term = sum->firstTerm;
+    while(sum->nextTerm != NULL){
+        fprintterm(f,term);
+        fprintf(f, " + ");
+        sum = sum->nextTerm;
+        term = sum->firstTerm;
+    }
+    if(sum->firstTerm != NULL)
+    fprintterm(f, sum->firstTerm);
+    else printf("empty sum, weird\n");
+}

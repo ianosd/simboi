@@ -114,6 +114,10 @@ void splitByChar(char c, const char *input, char** a, char** b){
     *b = bguy;
 }
 int main(int argc, char** argv){
+
+    initVarHash();
+    initBindings();
+
     char input[100] = "notexit";
     if(argc ==1)
         derivand = xconst;
@@ -130,7 +134,8 @@ int main(int argc, char** argv){
         popInputStack(&myInputStack, &yyin);
         yyparse();
         printf("(Done)\n");
-        scanf("%99s", input);
+        scanf("%[^\n]99s", input);
+        getchar();
     }
 }
 
