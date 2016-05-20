@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include "safecat.h"
 #include "inputstack.h"
+#include "bindings.h"
 
+sumstruct* bindings[MAX_BINDINGS];
 const char* derivand;
 const char* xconst = "x";
 extern char* yytext;
@@ -27,13 +29,17 @@ void done_scan_string();
 %type <num> fun
 %type <sum> expr
 %type <prod> term
+%right '='
 %left '+'
 %left '*'
+%left '!'
 %%
 /*arithmetic-specific gramar*/
 
-start: expr {printf("Identified expression:\n"); printsum($1);}
+start: expr {printf("Identified expression:"); printsum($1);printf("\n");}
+     | UNKN '=' expr {bind($1, $3); printf("%s = ", $1); printsum($3); printf("\n");}
 expr: term {printf("Made empty sum"); $$=termedsum($1);}
+    | '!' UNKN {$$ = findbinding($2); }
     | '(' expr ')' {$$ = $2;}
     | expr '*' expr { printf("Multiplying two sum expressions\n");$$ = $1; mulsums($$, $3); }
     | expr '+' expr {$$ = $1; addsums($$, $3);}

@@ -8,7 +8,7 @@ int sign(int a){
     else if (a<0) return -1;
     else return 0;
 }
-int getsymid(char* sym){
+int getsymid(const char* sym){
     return sym[0];
 }
 

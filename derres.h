@@ -22,7 +22,7 @@ typedef struct exp_struct{
     struct exp_struct* nextTerm;
 }sumstruct; 
 
-int getsymid(char* sym);
+int getsymid(const char* sym);
 sumstruct* emptysum();
 sumstruct* termedsum(prodstruct*);
 prodstruct* emptyprod();
