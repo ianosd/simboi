@@ -26,7 +26,9 @@ char* safecat(int n, char* format, ...)
     return result;
 }
 derres kdifFun(int funCode){
+#ifdef DOLOG
     printf("Switching on code: %d\n", funCode);
+#endif
     switch(funCode){
         case SIN:
             return makeres("cos", "sin");
