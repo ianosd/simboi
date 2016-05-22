@@ -17,8 +17,8 @@ extern instack_t myInputStack;
 yylval.num = atoi(yytext); return NUM;}
 [ \t] 
 . 	{
-    printf("Lexical error");
-return 0;}
+    printf("lex err, ignoring: %c; ", yytext[0]);
+}
 [\n\0]      return 0;
 %%
 
