@@ -1,1 +1,7 @@
-D[x, x]
+a = D[x, x]
+a = D[x, (x+!a)*(x+!a)]
+a = D[x, (x+!a)*(x+!a)]
+a = D[x, (x+!a)*(x+!a)]
+a = D[x, (x+!a)*(x+!a)]
+a = D[x, (x+!a)*(x+!a)]
+a = D[x, (x+!a)*(x+!a)]

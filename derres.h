@@ -29,12 +29,13 @@ int symord(int a, int b);
 sumstruct* emptysum();
 sumstruct* termedsum(prodstruct*);
 prodstruct* emptyprod();
-node* maketerm(char* sym);
+node* maketerm(const char* sym);
 void multerm_num(prodstruct* prod, int n);
-void multerm_sym(prodstruct* prod, char* sym);
+void multerm_sym(prodstruct* prod, const char* sym);
 void multerms(prodstruct* dst, const prodstruct* other);
 void mulsums( sumstruct* dst, sumstruct* other); 
 void addsums(sumstruct* dst, sumstruct* other); 
 void addTerm(sumstruct* sum, prodstruct* p);
 void printsum(sumstruct*);
+sumstruct* copySum(const sumstruct* sum);
 #endif

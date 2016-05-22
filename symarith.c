@@ -66,14 +66,14 @@ node* copyNode(node* n){
   return ret;
 }
 
-prodstruct* copyProd(prodstruct* prod){
+prodstruct* copyProd(const prodstruct* prod){
   prodstruct* copy = (prodstruct*) malloc(sizeof(prodstruct));
   copy->mul = prod->mul;
   copy->term = copyNode(prod->term);
   return copy;
 }
 
-sumstruct* copySum(sumstruct* sum){
+sumstruct* copySum(const sumstruct* sum){
   sumstruct* copy = NULL;
   if(sum!=NULL)
   {
@@ -109,7 +109,7 @@ void multerm_num(prodstruct* prod, int n){
     prod->mul *= n;
 }
 
-void multerm_sym(prodstruct* prod, char* sym){
+void multerm_sym(prodstruct* prod, const char* sym){
     node* n = maketerm(sym);
     n->next = prod->term;
     prod->term = n;
@@ -162,6 +162,14 @@ int convorder(sumstruct* a, sumstruct* b){
 }
 
 void compress(sumstruct* sum){
+    if(sum->firstTerm->mul == 0){
+        //you could release firstTerm here
+
+        //skip the first term
+        //are you sure it will be enough?
+        sum->firstTerm = sum->nextTerm->firstTerm;
+        sum->nextTerm = sum->nextTerm->nextTerm;
+    }
     while(sum->nextTerm != NULL){
         int comp = convorder(sum, sum->nextTerm);
         if (comp == 0){
@@ -174,19 +182,6 @@ void compress(sumstruct* sum){
     }
 }
 
-//!! this may modify other
-void addsums(sumstruct* dst, sumstruct* other){
-    if(prodcmp(other->firstTerm, dst->firstTerm)<0){
-        prodstruct* aux = other->firstTerm;
-        sumstruct *auxsum = other->nextTerm;
-        other->firstTerm = dst->firstTerm;
-        other->nextTerm = dst->nextTerm;
-        dst->firstTerm = aux;
-        dst->nextTerm = auxsum;//understand what happens if you do not swap lists
-    }
-    addsums2(dst, other);
-    compress(dst);
-}
 void addsums2(sumstruct* dst, sumstruct* other){
     //you shure there are only elementary 0-termed sums?
     //  if(dst->nextTerm == NULL)
@@ -210,6 +205,20 @@ void addsums2(sumstruct* dst, sumstruct* other){
             addsums2(nexta, nextb);
         }
     }        
+}
+
+//!! this may modify other
+void addsums(sumstruct* dst, sumstruct* other){
+    if(prodcmp(other->firstTerm, dst->firstTerm)<0){
+        prodstruct* aux = other->firstTerm;
+        sumstruct *auxsum = other->nextTerm;
+        other->firstTerm = dst->firstTerm;
+        other->nextTerm = dst->nextTerm;
+        dst->firstTerm = aux;
+        dst->nextTerm = auxsum;//understand what happens if you do not swap lists
+    }
+    addsums2(dst, other);
+    compress(dst);
 }
 
 void mulsums(sumstruct* dst, sumstruct* other){
@@ -241,7 +250,7 @@ void addTerm(sumstruct* sum, prodstruct* p){
   }
 }
 
-node* maketerm(char* sym){
+node* maketerm(const char* sym){
     node* nod= (node*) malloc(sizeof(node));
     nod->next = NULL;
     nod->id = getsymid(sym);
@@ -249,7 +258,8 @@ node* maketerm(char* sym){
 }
 void printterm(prodstruct* term){
     node* rterm = term->term;
-    if(rterm != NULL){
+    //dirty trick to show 0 vals ok
+    if(rterm != NULL && term->mul!=0){
       if(term->mul!=1)
         printf("%d*",term->mul);
       while(rterm->next!=NULL){

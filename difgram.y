@@ -13,6 +13,10 @@ instack_t myInputStack;
 int yydebug;
 void scan_string(char*);
 void done_scan_string();
+
+//to get rid of those warnings
+int yylex();
+int yyerror(const char* err);
 //IMPORTANT for memory management: every string in derres(a pair of derived and initial expression)
 //is created either in a makeres or a safecat function
 %}
@@ -40,38 +44,46 @@ start: expr {printf("ans = "); printsum($1); bind("ans", $1); printf("\n");}
      | UNKN '=' expr {bind($1, $3); printf("%s = ", $1); printsum($3); printf("\n");}
 expr: term {
 #ifdef DOLOG
-    printf("Made empty sum");
+          printf("Made empty sum");
 #endif
-            $$=termedsum($1);}
+          $$=termedsum($1);}
     | '!' UNKN {$$ = findbinding($2); }
     | '(' expr ')' {$$ = $2;}
     | expr '*' expr { 
-    #ifdef DOLOG
+#ifdef DOLOG
         printf("Multiplying two sum expressions\n");
 #endif
     $$ = $1; mulsums($$, $3); }
     | expr '+' expr {$$ = $1; addsums($$, $3);}
 
 /*this one to allow derivatives to be expressions*/
-expr: 'D' '[' UNKN {derivand = strdup($3);
+expr: 'D' '[' UNKN  
+    {
+        derivand = strdup($3);
 #ifdef DOLOG
-    printf("Diff rel to %s\n", derivand);
+        printf("Diff rel to %s\n", derivand);
 #endif
-} 
-      ',' der ']'{ //as soon as der text is avalible, add it to the input stack
-                addToInputStack(&myInputStack,$6.dertext);
-                
-                #ifdef DOLOG
-                    printf("dErtext = %s\n", $6.dertext);
+    } 
+      ',' der ']'
+    { 
+        //as soon as derivative text is avalible,
+        //add it to the input stack
+        addToInputStack(&myInputStack,$6.dertext);
+        //now the parser is reading from the explicited derivative
+#ifdef DOLOG
+        printf("derivative = %s\n", $6.dertext);
 #endif
-//TODO dealocate derivand}
-            } 
+//TODO dealocate derivand
+//parse the derivative, resulting in an expression
+    } 
             expr {$$=$9;};
 
 
 
 term: NUM  {$$ = emptyprod(); multerm_num($$, $1);} 
     | UNKN {$$ = emptyprod(); multerm_sym($$, $1);}
+    /*the last rule is for function identification, it will just
+    treat a function term "f(arg)" as a symbol*/
     | UNKN '(' UNKN ')' {char* sym = safecat(2, "%s(%s)", $1, $3); $$ = emptyprod(); multerm_sym($$, sym);}
     /*| term '*' term {$$ = $3; multerms($$, $1);printf("Mut term*term\n");}*/
     /*| '(' term ')' {$$ = $2;}*/
@@ -147,24 +159,37 @@ int main(int argc, char** argv){
     initVarHash();
     initBindings();
 
-    char input[100] = "notexit";
-    if(argc ==1)
-        derivand = xconst;
-    else
-        strcpy(input, argv[1]);
+    FILE* input_file = NULL;
+    char input[100] = "\0notexit";
+    if(argc >1)
+    {
+        input_file = fopen(argv[1], "r");
+    }
+
+    if(input_file == NULL)
+    {
+        printf("No input file, running in interactive mode\n");
+        input_file = stdin;
+    }
     char *a, *b;
     while(strcmp(input, "exit")!=0){
-        
-        scanf("%[^\n]99s", input);
-        getchar();
+
+        input[0] = 0;
+        fscanf(input_file, "%[^\n]99s", input);
+        if(fgetc(input_file) == EOF)
+        {
+            printf("Finished parsing input, switching to interactive mode\n");
+            fclose(input_file);
+            input_file = stdin;
+        }
 #ifdef DOLOG
-    printf("Input = %s\n", input);
+        printf("Input = %s\n", input);
 #endif
 
         splitByChar(']', input, &a, &b);
-        
+
 #ifdef DOLOG
-    printf("s1: %s, s2: %s\n", a, b);
+        printf("s1: %s, s2: %s\n", a, b);
 #endif
 
         init_inStack(&myInputStack);
@@ -172,12 +197,12 @@ int main(int argc, char** argv){
         addToInputStack(&myInputStack, a);
         popInputStack(&myInputStack, &yyin);
         yyparse();
-        
+
 #ifdef DOLOG
-    printf("(Done)\n");
+        printf("(Done)\n");
 #endif
 
     }
 }
 
-int yyerror(char* str){return -1;}
+int yyerror(const char* str){return -1;}

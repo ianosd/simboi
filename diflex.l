@@ -6,10 +6,8 @@ extern instack_t myInputStack;
 
 %}
 %%
-sin {yylval.num = SIN; return SIN;}
-cos {yylval.num = COS; return COS;}
-exp {yylval.num = EXP; return EXP;}
-log {yylval.num = LOG; return LOG;}
+
+#.* ;//ignore everything beginning with a #
 [+*()\[\]D,=!] 	return yytext[0];
 [a-z]+'? {char*  copy = malloc(strlen(yytext)+1); strcpy(copy, yytext);  yylval.text = copy; return UNKN;}
 [0-9]+ {
