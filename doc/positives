@@ -1,0 +1,9 @@
+a = x+x
+#result: 2*x
+b = !a*(y+z)
+#result: 2*x*y + 2*x*z
+c = !b*D[x, x*(x+1)]
+#result: 4*x*x*y + 4*x*x*z + 2*x*y + 2*x*z
+d = D[x, x*(x+1)*(x+2)*(x+3)]
+#result: O(2) + 4*x*x*x
+#O(2) is not the output, it simply stands for a polynomial of deg. 2

@@ -1,0 +1,11 @@
+a = D[x,f(x+1)]
+#the correct derivative will be computed, but the algebraic parser
+#can't handle expressions inside functions
+#it will result in a silent fail(don't know exactly why)
+a = 4
+b = D[x, !a*x]
+#the parser will not treat !a as 4
+a = 2+(x+y
+#will signal unexpected token(0) -- the number is the code of the character
+a = x+ 2 constant
+#will signal unexpected token: constant

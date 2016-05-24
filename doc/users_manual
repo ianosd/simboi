@@ -1,0 +1,23 @@
+#A small tutorial for a small program (the programs name is syms)
+#
+#This file can be executed by calling ./../syms user_manual
+#(the program interprets input until it reaches "exit")
+#when file is finised, if exit was not provided to the interpreter 
+#the program will fall back on standard input
+#
+#Lines that start with a hash are ignored
+#You can assign an expression to a symbol:
+a = x + y
+#Now to access it's content:
+b = !a*(z + t)
+#Note the difference:
+c = a*(z+t)
+#You can write an expression without assigning it. It will be
+#assigned by default to the symbol "ans"
+!b*(1+q)
+#You can differentiate an expression:
+diff = D[x, x*(x+1)]
+#Unfortunatley, symbols can not be expanded inside differentials
+#Just don't design a spacecraft using this program!
+#When finished, type:
+exit

@@ -9,7 +9,7 @@ extern instack_t myInputStack;
 
 #.* ;//ignore everything beginning with a #
 [+*()\[\]D,=!] 	return yytext[0];
-[a-z]+'? {char*  copy = malloc(strlen(yytext)+1); strcpy(copy, yytext);  yylval.text = copy; return UNKN;}
+[a-zA-Z]+[a-zA-Z0-9_']* {char*  copy = malloc(strlen(yytext)+1); strcpy(copy, yytext);  yylval.text = copy; return UNKN;}
 [0-9]+ {
 #ifdef DOLOG
     printf("Ident text as number");

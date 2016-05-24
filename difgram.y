@@ -42,7 +42,7 @@ int yyerror(const char* err);
 
 start: expr {printf("ans = "); printsum($1); bind("ans", $1); printf("\n");}
      | UNKN '=' expr {bind($1, $3); printf("%s = ", $1); printsum($3); printf("\n");}
-     | error {yyerrok; yyclearin; printf("Unexpected token %s(%d)\n", yytext, yytext[0]);}
+     | error {yyerrok; yyclearin; printf("Unexpected token: %s(%d)\n", yytext, yytext[0]);}
      | ;
 expr: term {
 #ifdef DOLOG
@@ -59,7 +59,7 @@ expr: term {
     | expr '+' expr {$$ = $1; addsums($$, $3);}
 
 expr: 'D' '[' error ',' 
-    {yyerrok;printf("Expected symbol, assuming we diff. with rep. to x\n"); derivand = "x";}  
+    {yyerrok; printf("Expected symbol, assuming we diff. with rep. to x\n"); derivand = "x";}  
        der ']'
     { 
         //as soon as derivative text is avalible,
@@ -67,7 +67,7 @@ expr: 'D' '[' error ','
         addToInputStack(&myInputStack,$6.dertext);
         //now the parser is reading from the explicited derivative
 #ifdef DOLOG
-        printf("derivative = %s\n", $6.dertext);
+        printf("expanded der. = %s\n", $6.dertext);
 #endif
 //TODO dealocate derivand
 //parse the derivative, resulting in an expression
@@ -87,9 +87,7 @@ expr: 'D' '[' UNKN
         //add it to the input stack
         addToInputStack(&myInputStack,$6.dertext);
         //now the parser is reading from the explicited derivative
-#ifdef DOLOG
         printf("derivative = %s\n", $6.dertext);
-#endif
 //TODO dealocate derivand
 //parse the derivative, resulting in an expression
     } 
